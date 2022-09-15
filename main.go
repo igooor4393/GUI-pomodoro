@@ -2,23 +2,25 @@ package main
 
 import (
 	"fmt"
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"strconv"
+	"time"
 )
 
 func main() {
 
+	seconds := 0
+
+	clock := widget.NewLabel("Time: 00:00:00")
+	clock.Alignment = fyne.TextAlignCenter
+
 	a := app.New()
 	w := a.NewWindow("Недокалькулятор GUI golang")
+	w.Resize(fyne.NewSize(400, 300))
 
-	//label := widget.NewLabel("Привет")
-	//entry := widget.NewEntry()
-	//btn := widget.NewButton("Push", func() {
-	//	data := entry.Text
-	//	fmt.Println(data)
-	//})
 	label := widget.NewLabel("enter number")
 	entry := widget.NewEntry()
 
@@ -42,21 +44,21 @@ func main() {
 			mul := numb1 * numb2
 			div := numb1 / numb2
 
-			//sum1 := strconv.FormatFloat(sum, 'E', -1, 64)
-			//res1 := strconv.FormatFloat(res, 'E', -1, 64)
-			//mul1 := strconv.FormatFloat(mul, 'E', -1, 64)
-			//div1 := strconv.FormatFloat(div, 'E', -1, 64)
-
-			//answer.SetText("(+)" + sum1 + "/n" + "(-)" + res1 + "/n" + "(*)" + mul1 + "/n" + "(/)" + div1 + "/n")
 			answer.SetText(fmt.Sprintf("(+) %f\n (-) %f\n (*) %f\n (/) %f\n", sum, res, mul, div))
 
 		}
 	})
 
+	btnTime := widget.NewButton("start", func() {
+		for range time.Tick(time.Second) {
+			seconds++
+			clock.SetText(formatDuration(seconds))
+		}
+	})
+
 	w.SetContent(container.NewVBox(
-		//label,
-		//entry,
-		//btn,
+
+		clock,
 		label,
 		entry,
 
@@ -64,9 +66,14 @@ func main() {
 		entry2,
 
 		buttn,
-
+		btnTime,
 		answer,
 	))
 
 	w.ShowAndRun()
+}
+
+func formatDuration(seconds int) string {
+	duration, _ := time.ParseDuration(strconv.Itoa(seconds) + "s")
+	return fmt.Sprintf("Time: %02d:%02d:%02d", int64(duration.Hours())%24, int64(duration.Minutes())%60, int64(duration.Seconds())%60)
 }
