@@ -49,11 +49,17 @@ func main() {
 		}
 	})
 
-	btnTime := widget.NewButton("start", func() {
+	btnTimeStart := widget.NewButton("start", func() {
 		for range time.Tick(time.Second) {
 			seconds++
 			clock.SetText(formatDuration(seconds))
 		}
+	})
+
+	btnTimeStop := widget.NewButton("stop", func() {
+
+		clock.SetText("00")
+
 	})
 
 	w.SetContent(container.NewVBox(
@@ -66,7 +72,8 @@ func main() {
 		entry2,
 
 		buttn,
-		btnTime,
+		btnTimeStart,
+		btnTimeStop,
 		answer,
 	))
 
