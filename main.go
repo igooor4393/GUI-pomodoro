@@ -50,15 +50,17 @@ func main() {
 	})
 
 	btnTimeStart := widget.NewButton("start", func() {
-		for range time.Tick(time.Second) {
-			seconds++
-			clock.SetText(formatDuration(seconds))
-		}
+		go func() {
+			for range time.Tick(time.Second) {
+				seconds++
+				clock.SetText(formatDuration(seconds))
+			}
+		}()
 	})
 
 	btnTimeStop := widget.NewButton("stop", func() {
-
-		clock.SetText("00")
+		seconds = 0
+		clock.SetText("Time: 00:00:00")
 
 	})
 
@@ -84,3 +86,4 @@ func formatDuration(seconds int) string {
 	duration, _ := time.ParseDuration(strconv.Itoa(seconds) + "s")
 	return fmt.Sprintf("Time: %02d:%02d:%02d", int64(duration.Hours())%24, int64(duration.Minutes())%60, int64(duration.Seconds())%60)
 }
+
