@@ -12,7 +12,8 @@ import (
 
 func main() {
 
-	var running bool
+	running := make(chan bool)
+
 	seconds := 0
 
 	clock := widget.NewLabel("Time: 00:00:00")
@@ -51,20 +52,29 @@ func main() {
 	})
 
 	btnTimeStart := widget.NewButton("start", func() {
-		running = true
-		if running == true{
-			go func() {
-				for range time.Tick(time.Second) {
-					seconds++
-					clock.SetText(formatDuration(seconds))
-				}
-			}()
+
+
+		for {
+			select {
+			case <- running:
+				return
+			default:
+				go func() {
+					for range time.Tick(time.Second) {
+						seconds++
+						clock.SetText(formatDuration(seconds))
+					}
+				}()
+			}
+
+
 		}
 
 	})
 
 	btnTimeStop := widget.NewButton("stop", func() {
-		running = false
+		// Quit goroutine
+		running <- true
 		seconds = 0
 		clock.SetText("Time: 00:00:00")
 
