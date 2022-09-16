@@ -12,6 +12,7 @@ import (
 
 func main() {
 
+	var running bool
 	seconds := 0
 
 	clock := widget.NewLabel("Time: 00:00:00")
@@ -50,15 +51,20 @@ func main() {
 	})
 
 	btnTimeStart := widget.NewButton("start", func() {
-		go func() {
-			for range time.Tick(time.Second) {
-				seconds++
-				clock.SetText(formatDuration(seconds))
-			}
-		}()
+		running = true
+		if running == true{
+			go func() {
+				for range time.Tick(time.Second) {
+					seconds++
+					clock.SetText(formatDuration(seconds))
+				}
+			}()
+		}
+
 	})
 
 	btnTimeStop := widget.NewButton("stop", func() {
+		running = false
 		seconds = 0
 		clock.SetText("Time: 00:00:00")
 
