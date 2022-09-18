@@ -6,89 +6,126 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"github.com/faiface/beep/mp3"
+	"github.com/faiface/beep/speaker"
+	"os"
 	"strconv"
 	"time"
 )
 
 func main() {
 
-	running := make(chan bool)
+	//Тест функцииТест функцииТест функцииТест функцииТест функцииТест функцииТест функции
+	entery := widget.NewEntry()
 
+	//Тест функцииТест функцииТест функцииТест функцииТест функцииТест функцииТест функции
+
+	workTime := "Work time: 00:00:07"
+	restTime := "Rest time: 00:00:05"
+	var cicle, cicleRest int
+
+	f, _ := os.Open("uwu-voice.mp3")
+	streamer, format, _ := mp3.Decode(f)
+	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+	speaker.Play(streamer)
+
+	running := false
 
 	seconds := 0
+	secondsRest := 0
 
-	clock := widget.NewLabel("Time: 00:00:00")
+	clock := widget.NewLabel("Work time: 00:00:00")
 	clock.Alignment = fyne.TextAlignCenter
 
+	clockRest := widget.NewLabel("Rest time: 00:00:00")
+	clockRest.Alignment = fyne.TextAlignCenter
+
+	ciclew := widget.NewLabel("0")
+
 	a := app.New()
-	w := a.NewWindow("Недокалькулятор GUI golang")
+	w := a.NewWindow("Pomidorka")
 	w.Resize(fyne.NewSize(400, 300))
 
-	label := widget.NewLabel("enter number")
-	entry := widget.NewEntry()
+	var btnTimeStart *widget.Button
 
-	label2 := widget.NewLabel("enter number")
-	entry2 := widget.NewEntry()
+	btnTimeStart = widget.NewButton("start work", func() {
 
-	answer := widget.NewLabel("")
-
-	buttn := widget.NewButton("calculate", func() {
-		data1 := entry.Text
-		data2 := entry2.Text
-		fmt.Println(data1, data2)
-
-		numb1, er := strconv.ParseFloat(data1, 64)
-		numb2, err := strconv.ParseFloat(data2, 64)
-		if err != nil || er != nil {
-			answer.SetText("Ошибка ввода")
-		} else {
-			sum := numb1 + numb2
-			res := numb1 - numb2
-			mul := numb1 * numb2
-			div := numb1 / numb2
-
-			answer.SetText(fmt.Sprintf("(+) %f\n (-) %f\n (*) %f\n (/) %f\n", sum, res, mul, div))
-
-		}
-	})
-
-	btnTimeStart := widget.NewButton("start", func() {
-
-
-			go func() {
-				<- running
-				for range time.Tick(time.Second) {
+		running = !running
+		go func() {
+			for range time.Tick(time.Second) {
+				if running {
 					seconds++
 					clock.SetText(formatDuration(seconds))
 
-				}
-			}()
+					btnTimeStart.Disable()
 
+					if formatDuration(seconds) == workTime {
+						btnTimeStart.SetText("start break")
+						btnTimeStart.Enable()
+
+						fmt.Println("ЭВРИКА")
+						f, _ := os.Open("uwu-voice.mp3")
+						streamer, format, _ := mp3.Decode(f)
+						speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+						speaker.Play(streamer)
+						cicle++
+						ciclew.SetText(fmt.Sprintf("%d", cicle))
+						break
+					}
+				} else if cicleRest < cicle {
+					secondsRest++
+					clockRest.SetText(formatDurationRest(secondsRest))
+
+					if formatDurationRest(secondsRest) == restTime {
+						fmt.Println("ЭВРИКА2")
+						f, _ := os.Open("work.mp3")
+						streamer, format, _ := mp3.Decode(f)
+						speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+						speaker.Play(streamer)
+						break
+					}
+				} else {
+					return
+				}
+
+			}
+		}()
 
 	})
 
 	btnTimeStop := widget.NewButton("stop", func() {
 		// Quit goroutine
-
-		running <- false
+		running = false
 		seconds = 0
-		clock.SetText("Time: 00:00:00")
+		clock.SetText("Work Time: 00:00:00")
+		clockRest.SetText("Break Time: 00:00:00")
 
 	})
 
+	//menu
+	fileMenuitem1 := fyne.NewMenuItem("Введите время", func() {
+
+	})
+	fileMenu := fyne.NewMenu("Настройки", fileMenuitem1)
+
+	mainMenu := fyne.NewMainMenu(fileMenu)
+	w.SetMainMenu(mainMenu)
+
 	w.SetContent(container.NewVBox(
-
+		entery,
 		clock,
-		label,
-		entry,
+		clockRest,
+		//label,
+		//entry,
 
-		label2,
-		entry2,
+		//label2,
+		//entry2,
 
-		buttn,
+		//buttn,
 		btnTimeStart,
 		btnTimeStop,
-		answer,
+		//answer,
+		ciclew,
 	))
 
 	w.ShowAndRun()
@@ -96,6 +133,17 @@ func main() {
 
 func formatDuration(seconds int) string {
 	duration, _ := time.ParseDuration(strconv.Itoa(seconds) + "s")
-	return fmt.Sprintf("Time: %02d:%02d:%02d", int64(duration.Hours())%24, int64(duration.Minutes())%60, int64(duration.Seconds())%60)
+	return fmt.Sprintf("Work time: %02d:%02d:%02d", int64(duration.Hours())%24, int64(duration.Minutes())%60, int64(duration.Seconds())%60)
+}
+func formatDurationRest(seconds int) string {
+	durationRest, _ := time.ParseDuration(strconv.Itoa(seconds) + "s")
+	return fmt.Sprintf("Rest time: %02d:%02d:%02d", int64(durationRest.Hours())%24, int64(durationRest.Minutes())%60, int64(durationRest.Seconds())%60)
 }
 
+//func changeTime(app fyne.App) {
+//	changeTimeWindow := app.NewWindow("Введите рабочее время")
+//
+//	entry := widget.NewEntry()
+//	entry.Validator = validation.NewRegexp(`^[0-9]+\.?[0-9]{0,3}$`, "Not valid hourly rate")
+//
+//}
