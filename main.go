@@ -24,10 +24,11 @@ func main() {
 	restTime := "Rest time: 00:00:05"
 	var cicle, cicleRest int
 
-	f, _ := os.Open("uwu-voice.mp3")
-	streamer, format, _ := mp3.Decode(f)
-	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
-	speaker.Play(streamer)
+	musicStartProgram()
+	//f, _ := os.Open("uwu-voice.mp3")
+	//streamer, format, _ := mp3.Decode(f)
+	//speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+	//speaker.Play(streamer)
 
 	running := false
 
@@ -40,18 +41,37 @@ func main() {
 	clockRest := widget.NewLabel("Rest time: 00:00:00")
 	clockRest.Alignment = fyne.TextAlignCenter
 
-	ciclew := widget.NewLabel("0")
+	ciclew := widget.NewLabel("Cycles completed: 0")
 
 	a := app.New()
-	w := a.NewWindow("Pomidorka")
+	w := a.NewWindow("PomodorGo")
 	w.Resize(fyne.NewSize(400, 300))
 
-	var btnTimeStart *widget.Button
+	var btnTimeStart, btnTimeStop *widget.Button
+	//btnTimeStop.Disabled()
+	btnTimeStop = widget.NewButton("Start new circle", func() {
 
-	btnTimeStart = widget.NewButton("start work", func() {
+		buttonPressing() //*ЗВУК
 
+		btnTimeStop.Disable()
+		// Quit goroutine
+		running = false
+		seconds = 0
+		secondsRest = 0
+		clock.SetText("Work Time: 00:00:00")
+		clockRest.SetText("Break Time: 00:00:00")
+		btnTimeStart.Enable()
+
+	})
+	//btnTimeStop.Disable()
+	btnTimeStart = widget.NewButton("Start work", func() {
+
+		buttonPressing() //*ЗВУК
+
+		btnTimeStop.Disable()
 		running = !running
 		go func() {
+
 			for range time.Tick(time.Second) {
 				if running {
 					seconds++
@@ -60,7 +80,7 @@ func main() {
 					btnTimeStart.Disable()
 
 					if formatDuration(seconds) == workTime {
-						btnTimeStart.SetText("start break")
+						btnTimeStart.SetText("Start break")
 						btnTimeStart.Enable()
 
 						fmt.Println("ЭВРИКА")
@@ -69,19 +89,21 @@ func main() {
 						speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 						speaker.Play(streamer)
 						cicle++
-						ciclew.SetText(fmt.Sprintf("%d", cicle))
+						ciclew.SetText(fmt.Sprintf("Cycles completed: %d", cicle))
 						break
 					}
 				} else if cicleRest < cicle {
+
+					btnTimeStart.SetText("Start work")
 					secondsRest++
+
 					clockRest.SetText(formatDurationRest(secondsRest))
+					btnTimeStart.Disable()
 
 					if formatDurationRest(secondsRest) == restTime {
+						btnTimeStop.Enable()
 						fmt.Println("ЭВРИКА2")
-						f, _ := os.Open("work.mp3")
-						streamer, format, _ := mp3.Decode(f)
-						speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
-						speaker.Play(streamer)
+						musicRestBells()
 						break
 					}
 				} else {
@@ -90,15 +112,6 @@ func main() {
 
 			}
 		}()
-
-	})
-
-	btnTimeStop := widget.NewButton("stop", func() {
-		// Quit goroutine
-		running = false
-		seconds = 0
-		clock.SetText("Work Time: 00:00:00")
-		clockRest.SetText("Break Time: 00:00:00")
 
 	})
 
@@ -140,10 +153,33 @@ func formatDurationRest(seconds int) string {
 	return fmt.Sprintf("Rest time: %02d:%02d:%02d", int64(durationRest.Hours())%24, int64(durationRest.Minutes())%60, int64(durationRest.Seconds())%60)
 }
 
-//func changeTime(app fyne.App) {
-//	changeTimeWindow := app.NewWindow("Введите рабочее время")
+//	func changeTime(app fyne.App) {
+//		changeTimeWindow := app.NewWindow("Введите рабочее время")
 //
-//	entry := widget.NewEntry()
-//	entry.Validator = validation.NewRegexp(`^[0-9]+\.?[0-9]{0,3}$`, "Not valid hourly rate")
+//		entry := widget.NewEntry()
+//		entry.Validator = validation.NewRegexp(`^[0-9]+\.?[0-9]{0,3}$`, "Not valid hourly rate")
 //
-//}
+// }
+func musicStartProgram() {
+	f, _ := os.Open("uwu-voice.mp3")
+
+	streamer, format, _ := mp3.Decode(f)
+	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+	speaker.Play(streamer)
+}
+func musicRestBells() {
+	f, _ := os.Open("work.mp3")
+
+	streamer, format, _ := mp3.Decode(f)
+	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+	speaker.Play(streamer)
+
+}
+func buttonPressing() {
+	file, _ := os.Open("button.mp3")
+
+	streamer, format, _ := mp3.Decode(file)
+	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+	speaker.Play(streamer)
+
+}
