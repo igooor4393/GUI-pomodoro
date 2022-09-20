@@ -14,14 +14,32 @@ import (
 )
 
 func main() {
+	ic, _ := fyne.LoadResourceFromPath("Pomodor.jpg")
 
-	//Тест функцииТест функцииТест функцииТест функцииТест функцииТест функцииТест функции
-	entery := widget.NewEntry()
-
-	//Тест функцииТест функцииТест функцииТест функцииТест функцииТест функцииТест функции
-
+	//++++++++++++++++++++++++++++++++++++++++++++++++ВЫпадающий список
+	period := widget.NewLabel("Select work time:")
 	workTime := "Work time: 00:00:07"
 	restTime := "Rest time: 00:00:05"
+
+	sel := widget.NewSelect([]string{"Work time: 00:15:00", "Work time: 00:20:00", "Work time: 00:25:00"}, func(s string) {
+		workTime = s
+	})
+
+	//btn := widget.NewButton("Sett", func() {
+
+	//})
+
+	//item2 := widget.NewRadioGroup([]string{"Work time: 00:00:15", "Work time: 00:00:25"}, func(s string) {})
+	//label := widget.NewLabel("Set time Work")
+	//enter := widget.NewEntry()
+	//item1 := widget.NewAccordionItem("Set time Work", item2)
+	//item3 := widget.NewAccordionItem("set", btn)
+
+	//accardion := widget.NewAccordion(item1)
+	//Тест функцииТест функцииТест функцииТест функцииТест функцииТест функцииТест функции
+
+	//Тест функцииТест функцииТест функцииТест функцииТест функцииТест функцииТест функции
+
 	var cicle, cicleRest int
 
 	musicStartProgram()
@@ -46,6 +64,7 @@ func main() {
 	a := app.New()
 	w := a.NewWindow("PomodorGo")
 	w.Resize(fyne.NewSize(400, 300))
+	w.SetIcon(ic)
 
 	var btnTimeStart, btnTimeStop *widget.Button
 	//btnTimeStop.Disabled()
@@ -63,6 +82,7 @@ func main() {
 		btnTimeStart.Enable()
 
 	})
+
 	//btnTimeStop.Disable()
 	btnTimeStart = widget.NewButton("Start work", func() {
 
@@ -83,11 +103,8 @@ func main() {
 						btnTimeStart.SetText("Start break")
 						btnTimeStart.Enable()
 
-						fmt.Println("ЭВРИКА")
-						f, _ := os.Open("uwu-voice.mp3")
-						streamer, format, _ := mp3.Decode(f)
-						speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
-						speaker.Play(streamer)
+						//fmt.Println("ЭВРИКА")
+						musicStartProgram()
 						cicle++
 						ciclew.SetText(fmt.Sprintf("Cycles completed: %d", cicle))
 						break
@@ -102,7 +119,7 @@ func main() {
 
 					if formatDurationRest(secondsRest) == restTime {
 						btnTimeStop.Enable()
-						fmt.Println("ЭВРИКА2")
+						//fmt.Println("ЭВРИКА2")
 						musicRestBells()
 						break
 					}
@@ -125,7 +142,11 @@ func main() {
 	w.SetMainMenu(mainMenu)
 
 	w.SetContent(container.NewVBox(
-		entery,
+		period,
+		sel,
+		//accardion,
+		//label,
+		//enter,
 		clock,
 		clockRest,
 		//label,
@@ -161,22 +182,22 @@ func formatDurationRest(seconds int) string {
 //
 // }
 func musicStartProgram() {
-	f, _ := os.Open("uwu-voice.mp3")
+	f, _ := os.Open("sounds/uwu-voice.mp3")
 
 	streamer, format, _ := mp3.Decode(f)
 	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 	speaker.Play(streamer)
 }
 func musicRestBells() {
-	f, _ := os.Open("work.mp3")
-
+	f, _ := os.Open("sounds/work.mp3")
+	//Mu, _ := fyne.LoadResourceFromPath("/sounds/button.mp3")
 	streamer, format, _ := mp3.Decode(f)
 	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 	speaker.Play(streamer)
 
 }
 func buttonPressing() {
-	file, _ := os.Open("button.mp3")
+	file, _ := os.Open("sounds/button.mp3")
 
 	streamer, format, _ := mp3.Decode(file)
 	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
