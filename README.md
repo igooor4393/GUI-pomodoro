@@ -1,7 +1,6 @@
 
 🍅 GUI - PomodorGO
 
+![](https://github.com/igooor4393/GUI-pomodoro/raw/wich-chanel/PomodorGo.png)
 
-[![](.PomodorGO.png)](https://github.com/igooor4393/GUI-pomodoro/blob/7a771687552d491c829875346b5456d8e88cbef5/PomodorGo.png)
-
-The icon will also change:
+Just a little pen test application. A bunch of bugs, etc., but I figured out how to fix them and I'm ready to move on, in the future I may quietly relax fixing local bugs.
