@@ -2,6 +2,6 @@
 🍅 GUI - PomodorGO
 
 
-![](./PomodorGO.png)
+![](.PomodorGO.png)
 
 The icon will also change:
